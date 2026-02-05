@@ -21,23 +21,84 @@ export default function InvitacionMiaFernanda() {
   );
 
   // =========================
-  // VIDEO SETTINGS
+  // VIDEO + AUDIO SETTINGS
   // =========================
-  const VIDEO_SRC = "/intro.mp4"; // coloca el video aquí (public/intro.mp4)
+  const VIDEO_SRC = "/intro.mp4"; // public/intro.mp4
+  const AUDIO_SRC = "/tema.mp3"; // public/tema.mp3 (sin audio en el video)
+
   const [phase, setPhase] = useState("video"); // "video" | "invite"
   const [videoError, setVideoError] = useState(false);
-  const videoRef = useRef(null);
+  const [needsUserPlay, setNeedsUserPlay] = useState(false);
+
+  // caption overlay (aparece 1s después de iniciar reproducción)
+  const [showVideoCaption, setShowVideoCaption] = useState(false);
+
+  // transiciones suaves
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [inviteVisible, setInviteVisible] = useState(false);
 
-  // Si el autoplay falla (iOS / restricciones), mostramos botón "Toca para reproducir"
-  const [needsUserPlay, setNeedsUserPlay] = useState(false);
+  const videoRef = useRef(null);
+  const audioRef = useRef(null);
+  const captionTimeoutRef = useRef(null);
 
-  // Caption overlay (aparece 1s después de iniciar reproducción)
-  const [showVideoCaption, setShowVideoCaption] = useState(false);
+  const whatsappLink = useMemo(() => {
+    const text = encodeURIComponent(DATA.whatsappMsg);
+    return `https://wa.me/${DATA.whatsappPhone}?text=${text}`;
+  }, [DATA.whatsappMsg, DATA.whatsappPhone]);
 
+  const clearCaptionTimer = () => {
+    if (captionTimeoutRef.current) {
+      window.clearTimeout(captionTimeoutRef.current);
+      captionTimeoutRef.current = null;
+    }
+  };
+
+  const scheduleCaption = () => {
+    clearCaptionTimer();
+    setShowVideoCaption(false);
+    captionTimeoutRef.current = window.setTimeout(() => {
+      setShowVideoCaption(true);
+    }, 1000);
+  };
+
+  const startAudio = async () => {
+    const a = audioRef.current;
+    if (!a) return;
+
+    // no reiniciar si ya está sonando
+    if (!a.paused) return;
+
+    try {
+      a.volume = 0.7; // ajusta a gusto
+      await a.play();
+    } catch {
+      // Autoplay puede ser bloqueado (normal en móviles). Se intentará de nuevo con interacción.
+    }
+  };
+
+  const goInvite = () => {
+    if (isTransitioning) return;
+
+    setIsTransitioning(true);
+    clearCaptionTimer();
+    setShowVideoCaption(false);
+
+    // Fade-out overlay primero, luego mostramos invitación con fade-in
+    window.setTimeout(() => {
+      setPhase("invite");
+      requestAnimationFrame(() => setInviteVisible(true));
+
+      window.setTimeout(() => setIsTransitioning(false), 500);
+    }, 450);
+  };
+
+  // Intentar autoplay del video (y audio) cuando estamos en fase video
   useEffect(() => {
     if (phase !== "video") return;
+
+    setInviteVisible(false);
+    setVideoError(false);
+    setNeedsUserPlay(false);
 
     const v = videoRef.current;
     if (!v) return;
@@ -47,42 +108,29 @@ export default function InvitacionMiaFernanda() {
         await v.play();
         setNeedsUserPlay(false);
 
-        // Mostrar caption 1s después de comenzar
-        setShowVideoCaption(false);
-        window.setTimeout(() => setShowVideoCaption(true), 1000);
-      } catch (e) {
+        // Arrancar audio si se puede (si el navegador lo permite)
+        await startAudio();
+
+        // Caption 1s después
+        scheduleCaption();
+      } catch {
         setNeedsUserPlay(true);
       }
     };
 
     tryPlay();
+
+    return () => {
+      clearCaptionTimer();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
-
-  const whatsappLink = useMemo(() => {
-    const text = encodeURIComponent(DATA.whatsappMsg);
-    return `https://wa.me/${DATA.whatsappPhone}?text=${text}`;
-  }, [DATA.whatsappMsg, DATA.whatsappPhone]);
-
-  const goInvite = () => {
-    if (isTransitioning) return;
-
-    setIsTransitioning(true);
-    setShowVideoCaption(false);
-
-    // 1) Fade-out del overlay
-    setTimeout(() => {
-      setPhase("invite");
-
-      // 2) Fade-in de la invitación
-      requestAnimationFrame(() => setInviteVisible(true));
-
-      // reset
-      setTimeout(() => setIsTransitioning(false), 500);
-    }, 450);
-  };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-sky-950 via-sky-900 to-slate-950 text-white overflow-hidden">
+      {/* Audio global: continúa después del video */}
+      <audio ref={audioRef} src={AUDIO_SRC} loop preload="auto" />
+
       {/* Ambient background glows */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-sky-400/20 blur-3xl" />
@@ -100,11 +148,10 @@ export default function InvitacionMiaFernanda() {
         <div
           className={[
             "fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 transition-opacity duration-500",
-            isTransitioning ? "opacity-0 scale-[1.01]" : "opacity-100 scale-100"
+            isTransitioning ? "opacity-0" : "opacity-100",
           ].join(" ")}
         >
-
-          <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/15 bg-slate-950/70 shadow-2xl">
+          <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/15 bg-slate-950/70 shadow-2xl">
             {/* Frost border shimmer */}
             <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/15" />
             <div className="pointer-events-none absolute -inset-1 rounded-3xl opacity-70 [mask-image:radial-gradient(180px_180px_at_50%_0%,black,transparent)]">
@@ -134,13 +181,15 @@ export default function InvitacionMiaFernanda() {
                     onError={() => setVideoError(true)}
                   />
 
-                  {/* Caption overlay (mágico) */}
+                  {/* Caption overlay (mágico + grande) */}
                   <div className="absolute inset-x-0 bottom-0 p-6">
                     <div
                       className={[
                         "relative mx-auto w-fit max-w-[92%] overflow-hidden rounded-2xl border border-white/15 bg-black/45 px-5 py-3 text-center text-3xl sm:text-4xl font-extrabold leading-tight text-white backdrop-blur",
                         "transition-all duration-700 ease-out",
-                        showVideoCaption ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3",
+                        showVideoCaption
+                          ? "opacity-100 translate-y-0"
+                          : "opacity-0 translate-y-3",
                       ].join(" ")}
                     >
                       <span className="relative z-10">
@@ -151,7 +200,6 @@ export default function InvitacionMiaFernanda() {
                       </span>
                     </div>
                   </div>
-
                 </div>
               </div>
 
@@ -177,8 +225,11 @@ export default function InvitacionMiaFernanda() {
                         await videoRef.current?.play();
                         setNeedsUserPlay(false);
 
-                        setShowVideoCaption(false);
-                        window.setTimeout(() => setShowVideoCaption(true), 1000);
+                        // intentar arrancar audio con interacción
+                        await startAudio();
+
+                        // caption 1s después
+                        scheduleCaption();
                       } catch {
                         setNeedsUserPlay(true);
                       }
@@ -200,7 +251,9 @@ export default function InvitacionMiaFernanda() {
       <main
         className={[
           "relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-4 py-8 transition-all duration-700",
-          phase === "invite" && inviteVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
+          phase === "invite" && inviteVisible
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-2",
         ].join(" ")}
       >
         {/* Top badge */}
@@ -217,7 +270,6 @@ export default function InvitacionMiaFernanda() {
             <div className="h-full w-full animate-shimmer bg-gradient-to-r from-white/0 via-white/15 to-white/0" />
           </div>
 
-          {/* Aurora header */}
           <div className="relative p-6">
             <AuroraHeader />
 
@@ -225,7 +277,7 @@ export default function InvitacionMiaFernanda() {
               <p className="text-sm tracking-wide text-white/80">
                 Te invitamos a celebrar
               </p>
-              <h1 className="mt-2 text-4xl font-semibold tracking-tight">
+              <h1 className="mt-2 text-5xl font-semibold leading-none tracking-tight">
                 {DATA.festejada}
               </h1>
               <p className="mt-2 text-white/80">
@@ -302,7 +354,6 @@ export default function InvitacionMiaFernanda() {
           </div>
         </section>
 
-        {/* Bottom spacing for mobile */}
         <div className="h-10" />
       </main>
 
