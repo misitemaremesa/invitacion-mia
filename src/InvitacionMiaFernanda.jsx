@@ -100,7 +100,7 @@ export default function InvitacionMiaFernanda() {
         <div
           className={[
             "fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 transition-opacity duration-500",
-            isTransitioning ? "opacity-0" : "opacity-100",
+            isTransitioning ? "opacity-0 scale-[1.01]" : "opacity-100 scale-100"
           ].join(" ")}
         >
 
