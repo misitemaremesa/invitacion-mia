@@ -87,7 +87,6 @@ export default function InvitacionMiaFernanda() {
     window.setTimeout(() => {
       setPhase("invite");
       requestAnimationFrame(() => setInviteVisible(true));
-
       window.setTimeout(() => setIsTransitioning(false), 500);
     }, 450);
   };
@@ -262,8 +261,13 @@ export default function InvitacionMiaFernanda() {
           Invitación • Fantasía Invernal
         </div>
 
+        {/* Texto arriba de la imagen */}
+        <p className="mt-4 text-center text-sm tracking-wide text-white/80">
+          Te invitamos a celebrar
+        </p>
+
         {/* Card */}
-        <section className="relative mt-6 overflow-hidden rounded-3xl border border-white/15 bg-white/5 shadow-2xl">
+        <section className="relative mt-4 overflow-hidden rounded-3xl border border-white/15 bg-white/5 shadow-2xl">
           {/* Frost frame */}
           <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/15" />
           <div className="pointer-events-none absolute -inset-1 rounded-3xl opacity-70 [mask-image:radial-gradient(220px_220px_at_50%_0%,black,transparent)]">
@@ -271,20 +275,8 @@ export default function InvitacionMiaFernanda() {
           </div>
 
           <div className="relative p-6">
-            <AuroraHeader />
-
-            <div className="relative mt-4 text-center">
-              <p className="text-sm tracking-wide text-white/80">
-                Te invitamos a celebrar
-              </p>
-              <h1 className="mt-2 text-5xl font-semibold leading-none tracking-tight">
-                {DATA.festejada}
-              </h1>
-              <p className="mt-2 text-white/80">
-                cumple{" "}
-                <span className="font-semibold text-white">{DATA.edad}</span>
-              </p>
-            </div>
+            {/* Header con imagen + nombre/edad dentro del cuadro */}
+            <AuroraHeader festejada={DATA.festejada} edad={DATA.edad} />
 
             {/* Divider */}
             <div className="my-6 flex items-center justify-center gap-3">
@@ -390,44 +382,49 @@ function InfoRow({ label, value }) {
   );
 }
 
-function AuroraHeader() {
+function AuroraHeader({ festejada, edad }) {
   return (
-    <div className="relative mx-auto h-28 w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-950/30">
-      <div className="absolute inset-0 bg-[radial-gradient(100%_60%_at_50%_40%,rgba(34,211,238,0.22),transparent_60%),radial-gradient(80%_50%_at_25%_60%,rgba(129,140,248,0.18),transparent_65%),radial-gradient(80%_50%_at_75%_65%,rgba(16,185,129,0.12),transparent_70%)]" />
-      <div className="absolute inset-0 opacity-80 [mask-image:linear-gradient(to_bottom,black,transparent)]">
-        <div className="h-full w-full animate-shimmer bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
+    <div className="relative mx-auto w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-950/30">
+      {/* ===== Header visual ===== */}
+      <div className="relative h-64 sm:h-72 overflow-hidden">
+        {/* Fondo aurora */}
+        <div className="absolute inset-0 bg-[radial-gradient(100%_60%_at_50%_35%,rgba(34,211,238,0.25),transparent_60%),radial-gradient(80%_55%_at_20%_60%,rgba(129,140,248,0.18),transparent_65%),radial-gradient(80%_55%_at_80%_65%,rgba(16,185,129,0.10),transparent_70%)]" />
+        <div className="absolute inset-0 opacity-80 [mask-image:linear-gradient(to_bottom,black,transparent)]">
+          <div className="h-full w-full animate-shimmer bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
+        </div>
+
+        {/* Imagen */}
+        <img
+          src="/img_01.png"
+          alt="Fantasía invernal"
+          className="absolute inset-0 h-full w-full object-contain p-0 drop-shadow-[0_18px_45px_rgba(0,0,0,0.55)]"
+          loading="eager"
+        />
+
+        {/* Estrellitas */}
+        <div className="absolute inset-0">
+          <div className="absolute left-6 top-6 h-1.5 w-1.5 rounded-full bg-white/60" />
+          <div className="absolute left-20 top-10 h-1 w-1 rounded-full bg-white/45" />
+          <div className="absolute right-10 top-8 h-1.5 w-1.5 rounded-full bg-white/55" />
+          <div className="absolute right-24 top-14 h-1 w-1 rounded-full bg-white/40" />
+        </div>
       </div>
 
-      {/* Simple geometric ice castle */}
-      <svg
-        viewBox="0 0 360 120"
-        className="absolute bottom-0 left-0 h-full w-full"
-        aria-hidden="true"
-      >
-        <path
-          d="M40 110 L70 70 L90 90 L120 50 L150 75 L180 35 L210 78 L240 45 L270 88 L300 65 L330 110 Z"
-          fill="rgba(255,255,255,0.08)"
-        />
-        <path
-          d="M60 110 L85 85 L105 110 Z"
-          fill="rgba(255,255,255,0.12)"
-        />
-        <path
-          d="M155 110 L180 60 L205 110 Z"
-          fill="rgba(255,255,255,0.12)"
-        />
-        <path
-          d="M255 110 L280 80 L305 110 Z"
-          fill="rgba(255,255,255,0.12)"
-        />
-      </svg>
+      {/* ===== Texto dentro del cuadro, abajo de la imagen ===== */}
+      <div className="relative border-t border-white/10 bg-slate-950/25 px-4 py-4 text-center">
+        <h2
+          className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white drop-shadow-[0_10px_18px_rgba(0,0,0,0.45)]"
+          style={{ fontFamily: 'ui-serif, "Palatino Linotype", Palatino, serif' }}
+        >
+          {festejada}
+        </h2>
 
-      {/* Stars */}
-      <div className="absolute inset-0">
-        <div className="absolute left-6 top-4 h-1 w-1 rounded-full bg-white/60" />
-        <div className="absolute left-20 top-8 h-1 w-1 rounded-full bg-white/50" />
-        <div className="absolute right-10 top-6 h-1 w-1 rounded-full bg-white/60" />
-        <div className="absolute right-24 top-10 h-1 w-1 rounded-full bg-white/40" />
+        <p
+          className="mt-1 text-base sm:text-lg text-white/85"
+          style={{ fontFamily: 'ui-serif, "Palatino Linotype", Palatino, serif' }}
+        >
+          cumple <span className="font-bold text-white">{edad}</span>
+        </p>
       </div>
     </div>
   );
