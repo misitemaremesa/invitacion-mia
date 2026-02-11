@@ -45,6 +45,7 @@ export default function InvitacionMiaFernanda() {
   // transiciones suaves
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [inviteVisible, setInviteVisible] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
   const videoRef = useRef(null);
   const audioRef = useRef(null);
@@ -68,7 +69,7 @@ export default function InvitacionMiaFernanda() {
 
   const startAudio = async () => {
     const a = audioRef.current;
-    if (!a) return;
+    if (!a || isMuted) return;
 
     // no reiniciar si ya está sonando
     if (!a.paused) return;
@@ -130,10 +131,24 @@ export default function InvitacionMiaFernanda() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a) return;
+
+    a.muted = isMuted;
+
+    if (!isMuted && a.paused) {
+      a.volume = 0.7;
+      a.play().catch(() => {
+        // Puede requerir interacción del usuario en algunos navegadores.
+      });
+    }
+  }, [isMuted]);
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-sky-950 via-sky-900 to-slate-950 text-white overflow-hidden">
       {/* Audio global: continúa después del video */}
-      <audio ref={audioRef} src={AUDIO_SRC} loop preload="auto" />
+      <audio ref={audioRef} src={AUDIO_SRC} loop preload="auto" muted={isMuted} />
 
       {/* Ambient background glows */}
       <div className="pointer-events-none absolute inset-0">
@@ -317,6 +332,15 @@ export default function InvitacionMiaFernanda() {
         <div className="h-10" />
       </main>
 
+      <button
+        onClick={() => setIsMuted((prev) => !prev)}
+        className="fixed bottom-5 right-5 z-40 rounded-full border border-white/20 bg-slate-900/70 px-4 py-3 text-sm font-semibold text-white shadow-lg backdrop-blur hover:bg-slate-800/80 active:scale-[0.98]"
+        aria-label={isMuted ? "Activar música" : "Silenciar música"}
+      >
+        {isMuted ? "🔇 Música" : "🔊 Música"}
+      </button>
+
+
       {/* Keyframes (solo en este componente) */}
       <style>{`
         @keyframes shimmer {
@@ -377,7 +401,7 @@ function AuroraHeader({ festejada, edad }) {
             className="mt-3 text-lg sm:text-2xl font-semibold text-white/95 drop-shadow-[0_6px_10px_rgba(0,0,0,0.75)]"
             style={{ fontFamily: '"Palatino Linotype", Palatino, ui-serif, serif' }}
           >
-            cumple <span className="text-cyan-200">{edad}</span>
+            CUMPLE <span className="text-cyan-200">{edad.toUpperCase()}</span>
           </p>
         </div>
       </div>
