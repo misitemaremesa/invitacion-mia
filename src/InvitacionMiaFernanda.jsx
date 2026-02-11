@@ -290,7 +290,7 @@ export default function InvitacionMiaFernanda() {
 
           <div className="relative p-6">
             {/* Header con imagen + nombre/edad dentro del cuadro */}
-            <AuroraHeader festejada={DATA.festejada} edad={DATA.edad} />
+            <AuroraHeader />
 
             {/* Divider */}
             <div className="my-6 flex items-center justify-center gap-3">
@@ -351,6 +351,19 @@ export default function InvitacionMiaFernanda() {
           animation: shimmer 2.8s ease-in-out infinite;
         }
 
+
+        @keyframes stickerPopIn {
+          0% { opacity: 0; transform: translateY(10px) scale(0.9); }
+          70% { opacity: 1; transform: translateY(0) scale(1.03); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .sticker-pop-in {
+          animation: stickerPopIn 800ms ease-out both;
+        }
+        .sticker-pop-in-delay {
+          animation: stickerPopIn 950ms ease-out 180ms both;
+        }
+
         @keyframes snow {
           0% { transform: translateY(-10%); opacity: 0; }
           10% { opacity: 1; }
@@ -374,7 +387,7 @@ function InfoRow({ label, value }) {
   );
 }
 
-function AuroraHeader({ festejada, edad }) {
+function AuroraHeader() {
   return (
     <div className="relative mx-auto w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-950/30">
       <div className="relative h-[34rem] sm:h-[38rem] overflow-hidden">
@@ -388,21 +401,20 @@ function AuroraHeader({ festejada, edad }) {
         {/* Overlay suave para mejorar legibilidad */}
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-transparent to-slate-950/25" />
 
-        {/* Texto centrado dentro del pizarrón */}
-        <div className="absolute left-1/2 top-[50%] w-[56%] -translate-x-1/2 -translate-y-1/2 text-center">
-          <h2
-            className="text-4xl sm:text-5xl font-extrabold tracking-tight text-cyan-100 drop-shadow-[0_6px_10px_rgba(0,0,0,0.75)]"
-            style={{ fontFamily: '"Palatino Linotype", Palatino, ui-serif, serif' }}
-          >
-            {festejada}
-          </h2>
-
-          <p
-            className="mt-3 text-lg sm:text-2xl font-semibold text-white/95 drop-shadow-[0_6px_10px_rgba(0,0,0,0.75)]"
-            style={{ fontFamily: '"Palatino Linotype", Palatino, ui-serif, serif' }}
-          >
-            CUMPLE <span className="text-cyan-200">{edad.toUpperCase()}</span>
-          </p>
+        {/* Stickers centrados dentro del pizarrón */}
+        <div className="absolute left-1/2 top-[50%] flex w-[62%] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-4">
+          <img
+            src="/mia_01.png"
+            alt="Mía Fernanda"
+            className="sticker-pop-in w-full max-w-[320px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
+            loading="eager"
+          />
+          <img
+            src="/cumple_01.png"
+            alt="Cumple 8 años"
+            className="sticker-pop-in-delay w-[92%] max-w-[300px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
+            loading="eager"
+          />
         </div>
       </div>
     </div>
