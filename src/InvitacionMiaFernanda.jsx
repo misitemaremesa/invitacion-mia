@@ -6,19 +6,28 @@ export default function InvitacionMiaFernanda() {
   // =========================
   const DATA = useMemo(
     () => ({
-      festejada: "Mia Fernanda",
+      festejada: "Mía Fernanda",
       edad: "8 Años",
       fecha: "12 de marzo 2026",
       hora: "10:00 a.m.",
-      lugar: "📍 (Lugar por confirmar)", // <-- aquí pegas después
-      mapsUrl: "", // opcional: "https://maps.google.com/?q=..."
-      whatsappPhone: "52XXXXXXXXXX", // <-- cambia a tu número con código país, sin +, sin espacios
-      whatsappMsg:
-        "¡Hola! Confirmo asistencia a la fiesta de Mia Fernanda el 12 de marzo 2026 a las 10:00 a.m.",
-      dressCode: "Colores invernales: azul, blanco o plata (opcional).",
+      lugar: "Colegio Jaques Roussea",
     }),
     []
   );
+
+  const calendarLink = useMemo(() => {
+    const title = encodeURIComponent("Cumpleaños #8 de Mía Fernanda");
+    const details = encodeURIComponent(
+      "Acompáñanos a celebrar el cumpleaños de Mía Fernanda con una aventura invernal llena de magia."
+    );
+    const location = encodeURIComponent(DATA.lugar);
+
+    // Hora local de México (CDMX): UTC-6 para marzo 2026
+    const start = "20260312T160000Z";
+    const end = "20260312T190000Z";
+
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
+  }, [DATA.lugar]);
 
   // =========================
   // VIDEO + AUDIO SETTINGS
@@ -41,10 +50,6 @@ export default function InvitacionMiaFernanda() {
   const audioRef = useRef(null);
   const captionTimeoutRef = useRef(null);
 
-  const whatsappLink = useMemo(() => {
-    const text = encodeURIComponent(DATA.whatsappMsg);
-    return `https://wa.me/${DATA.whatsappPhone}?text=${text}`;
-  }, [DATA.whatsappMsg, DATA.whatsappPhone]);
 
   const clearCaptionTimer = () => {
     if (captionTimeoutRef.current) {
@@ -255,15 +260,9 @@ export default function InvitacionMiaFernanda() {
             : "opacity-0 translate-y-2",
         ].join(" ")}
       >
-        {/* Top badge */}
-        <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs text-white/80">
-          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-cyan-300/80" />
-          Invitación • Fantasía Invernal
-        </div>
-
         {/* Texto arriba de la imagen */}
         <p className="mt-4 text-center text-sm tracking-wide text-white/80">
-          Te invitamos a celebrar
+          Una mañana mágica para celebrar a
         </p>
 
         {/* Card */}
@@ -291,56 +290,25 @@ export default function InvitacionMiaFernanda() {
               <InfoRow label="⏰ Hora" value={DATA.hora} />
               <InfoRow label="📍 Lugar" value={DATA.lugar} />
             </div>
-
-            {/* Optional sections */}
-            <div className="mt-4 grid gap-3">
-              {DATA.dressCode?.trim() ? (
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs font-semibold text-white/80">
-                    Dress code
-                  </p>
-                  <p className="mt-1 text-sm text-white/85">{DATA.dressCode}</p>
-                </div>
-              ) : null}
-
-              {DATA.mapsUrl?.trim() ? (
-                <a
-                  href={DATA.mapsUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/85 hover:bg-white/10"
-                >
-                  🗺️ Abrir ubicación en Maps
-                </a>
-              ) : (
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
-                  🗺️ Ubicación: pendiente (la agregas cuando me la pases)
-                </div>
-              )}
-            </div>
-
             {/* CTA */}
             <div className="mt-6">
               <a
-                href={whatsappLink}
+                href={calendarLink}
                 target="_blank"
                 rel="noreferrer"
-                className="block w-full rounded-2xl bg-cyan-400/20 px-5 py-4 text-center text-sm font-semibold text-white hover:bg-cyan-400/25 active:scale-[0.99]"
+                className="block w-full rounded-2xl border border-white/15 bg-white/10 px-5 py-4 text-center text-sm font-semibold text-white hover:bg-white/15 active:scale-[0.99]"
               >
-                Confirmar asistencia por WhatsApp
+                Agregar al calendario 📅
               </a>
-              <p className="mt-2 text-center text-xs text-white/60">
-                (Se abrirá WhatsApp con un mensaje prellenado)
-              </p>
             </div>
 
             {/* Footer */}
             <div className="mt-6 text-center">
               <p className="text-sm text-white/80">
-                ¡Será un día mágico entre nieve y luces!
+                ¡Mía Fernanda está emocionada por celebrar contigo!
               </p>
               <p className="mt-1 text-xs text-white/55">
-                Invitación con estética original (fantasía invernal).
+                Habrá sonrisas, juegos y mucha fantasía invernal.
               </p>
             </div>
           </div>
@@ -385,46 +353,33 @@ function InfoRow({ label, value }) {
 function AuroraHeader({ festejada, edad }) {
   return (
     <div className="relative mx-auto w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-950/30">
-      {/* ===== Header visual ===== */}
-      <div className="relative h-64 sm:h-72 overflow-hidden">
-        {/* Fondo aurora */}
-        <div className="absolute inset-0 bg-[radial-gradient(100%_60%_at_50%_35%,rgba(34,211,238,0.25),transparent_60%),radial-gradient(80%_55%_at_20%_60%,rgba(129,140,248,0.18),transparent_65%),radial-gradient(80%_55%_at_80%_65%,rgba(16,185,129,0.10),transparent_70%)]" />
-        <div className="absolute inset-0 opacity-80 [mask-image:linear-gradient(to_bottom,black,transparent)]">
-          <div className="h-full w-full animate-shimmer bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
-        </div>
-
-        {/* Imagen */}
+      <div className="relative h-[34rem] sm:h-[38rem] overflow-hidden">
         <img
-          src="/img_01.png"
-          alt="Fantasía invernal"
-          className="absolute inset-0 h-full w-full object-contain p-0 drop-shadow-[0_18px_45px_rgba(0,0,0,0.55)]"
+          src="/fond_01_complet.jpg"
+          alt="Marco de Frozen"
+          className="absolute inset-0 h-full w-full object-cover"
           loading="eager"
         />
 
-        {/* Estrellitas */}
-        <div className="absolute inset-0">
-          <div className="absolute left-6 top-6 h-1.5 w-1.5 rounded-full bg-white/60" />
-          <div className="absolute left-20 top-10 h-1 w-1 rounded-full bg-white/45" />
-          <div className="absolute right-10 top-8 h-1.5 w-1.5 rounded-full bg-white/55" />
-          <div className="absolute right-24 top-14 h-1 w-1 rounded-full bg-white/40" />
+        {/* Overlay suave para mejorar legibilidad */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-transparent to-slate-950/25" />
+
+        {/* Texto centrado dentro del pizarrón */}
+        <div className="absolute left-1/2 top-[50%] w-[56%] -translate-x-1/2 -translate-y-1/2 text-center">
+          <h2
+            className="text-4xl sm:text-5xl font-extrabold tracking-tight text-cyan-100 drop-shadow-[0_6px_10px_rgba(0,0,0,0.75)]"
+            style={{ fontFamily: '"Palatino Linotype", Palatino, ui-serif, serif' }}
+          >
+            {festejada}
+          </h2>
+
+          <p
+            className="mt-3 text-lg sm:text-2xl font-semibold text-white/95 drop-shadow-[0_6px_10px_rgba(0,0,0,0.75)]"
+            style={{ fontFamily: '"Palatino Linotype", Palatino, ui-serif, serif' }}
+          >
+            cumple <span className="text-cyan-200">{edad}</span>
+          </p>
         </div>
-      </div>
-
-      {/* ===== Texto dentro del cuadro, abajo de la imagen ===== */}
-      <div className="relative border-t border-white/10 bg-slate-950/25 px-4 py-4 text-center">
-        <h2
-          className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white drop-shadow-[0_10px_18px_rgba(0,0,0,0.45)]"
-          style={{ fontFamily: 'ui-serif, "Palatino Linotype", Palatino, serif' }}
-        >
-          {festejada}
-        </h2>
-
-        <p
-          className="mt-1 text-base sm:text-lg text-white/85"
-          style={{ fontFamily: 'ui-serif, "Palatino Linotype", Palatino, serif' }}
-        >
-          cumple <span className="font-bold text-white">{edad}</span>
-        </p>
       </div>
     </div>
   );
