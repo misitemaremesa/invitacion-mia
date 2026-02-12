@@ -403,18 +403,23 @@ function AuroraHeader() {
 
         {/* Stickers posicionados dentro del pizarrón */}
         <div className="absolute inset-0">
-          <img
-            src="/mia_01.png"
-            alt="Mía Fernanda"
-            className="sticker-pop-in absolute left-1/2 top-[43%] w-[72%] max-w-[360px] -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
-            loading="eager"
-          />
-          <img
-            src="/cumple_01.png"
-            alt="Cumple 8 años"
-            className="sticker-pop-in-delay absolute left-1/2 top-[67%] w-[78%] max-w-[390px] -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
-            loading="eager"
-          />
+          <div className="absolute left-1/2 top-[43%] -translate-x-1/2 -translate-y-1/2">
+            <img
+              src="/mia_01.png"
+              alt="Mía Fernanda"
+              className="sticker-pop-in w-[72%] min-w-[260px] max-w-[360px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
+              loading="eager"
+            />
+          </div>
+
+          <div className="absolute left-1/2 top-[67%] -translate-x-1/2 -translate-y-1/2">
+            <img
+              src="/cumple_01.png"
+              alt="Cumple 8 años"
+              className="sticker-pop-in-delay w-[78%] min-w-[280px] max-w-[390px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
+              loading="eager"
+            />
+          </div>
         </div>
       </div>
     </div>
