@@ -145,6 +145,25 @@ export default function InvitacionMiaFernanda() {
     }
   }, [isMuted]);
 
+  useEffect(() => {
+    if (isMuted) return;
+
+    const unlockAudioOnInteraction = () => {
+      startAudio();
+    };
+
+    window.addEventListener("pointerdown", unlockAudioOnInteraction, {
+      passive: true,
+    });
+    window.addEventListener("keydown", unlockAudioOnInteraction);
+
+    return () => {
+      window.removeEventListener("pointerdown", unlockAudioOnInteraction);
+      window.removeEventListener("keydown", unlockAudioOnInteraction);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMuted]);
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-sky-950 via-sky-900 to-slate-950 text-white overflow-hidden">
       {/* Audio global: continúa después del video */}
