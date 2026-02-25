@@ -464,20 +464,20 @@ function AuroraHeader() {
 
         {/* Stickers posicionados dentro del pizarrón */}
         <div className="absolute inset-0">
-          <div className="absolute left-1/2 top-[43%] -translate-x-1/2 -translate-y-1/2">
+          <div className="absolute inset-x-0 top-[43%] flex -translate-y-1/2 justify-center px-4">
             <img
               src="/mia_01.png"
               alt="Mía Fernanda"
-              className="sticker-pop-in w-[56%] max-w-[280px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
+              className="sticker-pop-in w-[68%] max-w-[340px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
               loading="eager"
             />
           </div>
 
-          <div className="absolute left-1/2 top-[67%] -translate-x-1/2 -translate-y-1/2">
+          <div className="absolute inset-x-0 top-[67%] flex -translate-y-1/2 justify-center px-4">
             <img
               src="/cumple_01.png"
               alt="Cumple 8 años"
-              className="sticker-pop-in-delay w-[62%] max-w-[300px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
+              className="sticker-pop-in-delay w-[74%] max-w-[360px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
               loading="eager"
             />
           </div>
