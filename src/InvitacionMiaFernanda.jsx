@@ -145,6 +145,51 @@ export default function InvitacionMiaFernanda() {
   }, [isMuted]);
 
   useEffect(() => {
+    const a = audioRef.current;
+    if (!a) return;
+
+    const pauseAudio = () => {
+      a.pause();
+    };
+
+    const resumeAudioIfAllowed = () => {
+      if (isMuted) return;
+      a.volume = 0.7;
+      a.play().catch(() => {
+        // Puede requerir interacción del usuario en algunos navegadores.
+      });
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        pauseAudio();
+        return;
+      }
+
+      resumeAudioIfAllowed();
+    };
+
+    const handleWindowBlur = () => {
+      pauseAudio();
+    };
+
+    const handleWindowFocus = () => {
+      if (document.hidden) return;
+      resumeAudioIfAllowed();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleWindowBlur);
+    window.addEventListener("focus", handleWindowFocus);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleWindowBlur);
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+  }, [isMuted]);
+
+  useEffect(() => {
     if (isMuted || phase !== "video") return;
 
     const unlockAudioOnInteraction = () => {
@@ -347,13 +392,15 @@ export default function InvitacionMiaFernanda() {
                   />
                 </div>
 
-                <div className="absolute left-1/2 top-[79%] w-[36%] max-w-[140px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[40%] px-1">
-                  <img
-                    src="/mia_01.png"
-                    alt="Mía Fernanda en placa"
-                    className="h-auto w-full object-contain"
-                    loading="lazy"
-                  />
+                <div className="absolute inset-x-0 top-[80.5%] flex -translate-y-1/2 justify-center px-6">
+                  <div className="w-[34%] max-w-[124px] overflow-hidden rounded-[38%]">
+                    <img
+                      src="/mia_01.png"
+                      alt="Mía Fernanda en placa"
+                      className="h-auto w-full object-contain"
+                      loading="lazy"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
