@@ -34,12 +34,11 @@ export default function InvitacionMiaFernanda() {
   // =========================
   const INTRO_IMAGE_SRC = "/intro_01.png"; // public/intro_01.png
   const PLAY_IMAGE_SRC = "/dale_paly.png"; // public/dale_paly.png
-  const VIDEO_SRC = "/intro.mp4"; // public/intro.mp4
+  const YOUTUBE_VIDEO_ID = "jcllZ4jSIGI";
+  const YOUTUBE_EMBED_SRC = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&start=180&mute=1&controls=1&rel=0&playsinline=1`;
   const AUDIO_SRC = "/tema.mp3"; // public/tema.mp3 (sin audio en el video)
 
   const [phase, setPhase] = useState("intro"); // "intro" | "video" | "invite"
-  const [videoError, setVideoError] = useState(false);
-  const [needsUserPlay, setNeedsUserPlay] = useState(false);
 
   // caption overlay (aparece 1s después de iniciar reproducción)
   const [showVideoCaption, setShowVideoCaption] = useState(false);
@@ -49,7 +48,6 @@ export default function InvitacionMiaFernanda() {
   const [inviteVisible, setInviteVisible] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
-  const videoRef = useRef(null);
   const audioRef = useRef(null);
   const captionTimeoutRef = useRef(null);
 
@@ -100,39 +98,20 @@ export default function InvitacionMiaFernanda() {
 
   const startExperience = useCallback(async () => {
     setPhase("video");
-    setVideoError(false);
-    setNeedsUserPlay(false);
+    scheduleCaption();
     await startAudio();
-  }, [startAudio]);
+  }, [scheduleCaption, startAudio]);
 
-  // Intentar autoplay del video (y audio) cuando estamos en fase video
+  // Preparar audio cuando entramos a fase video
   useEffect(() => {
     if (phase !== "video") return;
 
-    const v = videoRef.current;
-    if (!v) return;
-
-    const tryPlay = async () => {
-      try {
-        await v.play();
-        setNeedsUserPlay(false);
-
-        // Arrancar audio si se puede (si el navegador lo permite)
-        await startAudio();
-
-        // Caption 1s después
-        scheduleCaption();
-      } catch {
-        setNeedsUserPlay(true);
-      }
-    };
-
-    tryPlay();
+    startAudio();
 
     return () => {
       clearCaptionTimer();
     };
-  }, [clearCaptionTimer, phase, scheduleCaption, startAudio]);
+  }, [clearCaptionTimer, phase, startAudio]);
 
   useEffect(() => {
     const a = audioRef.current;
@@ -249,16 +228,13 @@ export default function InvitacionMiaFernanda() {
 
               <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">
                 <div className="relative w-full aspect-[9/16]">
-                  <video
-                    ref={videoRef}
-                    src={VIDEO_SRC}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    playsInline
-                    muted
-                    autoPlay
-                    controls={false}
-                    onEnded={goInvite}
-                    onError={() => setVideoError(true)}
+                  <iframe
+                    src={YOUTUBE_EMBED_SRC}
+                    title="Video de invitación"
+                    className="absolute inset-0 h-full w-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
                   />
 
                   {/* Caption overlay (mágico + grande) */}
@@ -283,43 +259,6 @@ export default function InvitacionMiaFernanda() {
                 </div>
               </div>
 
-              {/* Solo mostramos UI cuando hay error o cuando se requiere tap para reproducir */}
-              {videoError ? (
-                <div className="mt-3 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-3 text-sm text-rose-100">
-                  No se pudo cargar el video. Revisa la ruta{" "}
-                  <span className="font-mono">{VIDEO_SRC}</span>.
-                  <div className="mt-2">
-                    <button
-                      onClick={goInvite}
-                      className="w-full rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/15"
-                    >
-                      Ver invitación
-                    </button>
-                  </div>
-                </div>
-              ) : needsUserPlay ? (
-                <div className="mt-3 rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur">
-                  <button
-                    onClick={async () => {
-                      try {
-                        await videoRef.current?.play();
-                        setNeedsUserPlay(false);
-
-                        // intentar arrancar audio con interacción
-                        await startAudio();
-
-                        // caption 1s después
-                        scheduleCaption();
-                      } catch {
-                        setNeedsUserPlay(true);
-                      }
-                    }}
-                    className="w-full rounded-xl bg-cyan-400/20 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-400/25 active:scale-[0.99]"
-                  >
-                    Toca para reproducir
-                  </button>
-                </div>
-              ) : null}
             </div>
           </div>
         </div>
@@ -336,11 +275,6 @@ export default function InvitacionMiaFernanda() {
             : "opacity-0 translate-y-2",
         ].join(" ")}
       >
-        {/* Texto arriba de la imagen */}
-        <p className="mt-4 text-center text-sm tracking-wide text-white/80">
-          Una mañana mágica para celebrar a
-        </p>
-
         {/* Card */}
         <section className="relative mt-4 overflow-hidden rounded-3xl border border-white/15 bg-white/5 shadow-2xl">
           {/* Frost frame */}
@@ -402,9 +336,6 @@ export default function InvitacionMiaFernanda() {
             <div className="mt-6 text-center">
               <p className="text-sm text-white/80">
                 ¡Mía Fernanda está emocionada por celebrar contigo!
-              </p>
-              <p className="mt-1 text-xs text-white/55">
-                Habrá sonrisas, juegos y mucha fantasía invernal.
               </p>
             </div>
           </div>
