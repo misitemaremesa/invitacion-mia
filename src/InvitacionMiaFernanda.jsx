@@ -35,7 +35,7 @@ export default function InvitacionMiaFernanda() {
   const INTRO_IMAGE_SRC = "/intro_01.png"; // public/intro_01.png
   const PLAY_IMAGE_SRC = "/dale_paly.png"; // public/dale_paly.png
   const YOUTUBE_VIDEO_ID = "jcllZ4jSIGI";
-  const YOUTUBE_EMBED_SRC = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&start=180&mute=1&controls=1&rel=0&playsinline=1`;
+  const YOUTUBE_EMBED_SRC = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&start=205&mute=1&controls=1&rel=0&playsinline=1`;
   const AUDIO_SRC = "/tema.mp3"; // public/tema.mp3 (sin audio en el video)
 
   const [phase, setPhase] = useState("intro"); // "intro" | "video" | "invite"
@@ -119,7 +119,7 @@ export default function InvitacionMiaFernanda() {
     startAudio();
     clearAutoInviteTimer();
 
-    // Inicia en 3:00 y dura hasta 3:15 => 15s
+    // Inicia en 3:25 y dura hasta 3:40 => 15s
     autoInviteTimeoutRef.current = window.setTimeout(() => {
       goInvite();
     }, 15_000);
