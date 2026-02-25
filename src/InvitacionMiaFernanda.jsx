@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export default function InvitacionMiaFernanda() {
   // =========================
@@ -32,10 +32,12 @@ export default function InvitacionMiaFernanda() {
   // =========================
   // VIDEO + AUDIO SETTINGS
   // =========================
+  const INTRO_IMAGE_SRC = "/intro_01.png"; // public/intro_01.png
+  const PLAY_IMAGE_SRC = "/dale_paly.png"; // public/dale_paly.png
   const VIDEO_SRC = "/intro.mp4"; // public/intro.mp4
   const AUDIO_SRC = "/tema.mp3"; // public/tema.mp3 (sin audio en el video)
 
-  const [phase, setPhase] = useState("video"); // "video" | "invite"
+  const [phase, setPhase] = useState("intro"); // "intro" | "video" | "invite"
   const [videoError, setVideoError] = useState(false);
   const [needsUserPlay, setNeedsUserPlay] = useState(false);
 
@@ -51,23 +53,22 @@ export default function InvitacionMiaFernanda() {
   const audioRef = useRef(null);
   const captionTimeoutRef = useRef(null);
 
-
-  const clearCaptionTimer = () => {
+  const clearCaptionTimer = useCallback(() => {
     if (captionTimeoutRef.current) {
       window.clearTimeout(captionTimeoutRef.current);
       captionTimeoutRef.current = null;
     }
-  };
+  }, []);
 
-  const scheduleCaption = () => {
+  const scheduleCaption = useCallback(() => {
     clearCaptionTimer();
     setShowVideoCaption(false);
     captionTimeoutRef.current = window.setTimeout(() => {
       setShowVideoCaption(true);
     }, 1000);
-  };
+  }, [clearCaptionTimer]);
 
-  const startAudio = async () => {
+  const startAudio = useCallback(async () => {
     const a = audioRef.current;
     if (!a || isMuted) return;
 
@@ -80,9 +81,9 @@ export default function InvitacionMiaFernanda() {
     } catch {
       // Autoplay puede ser bloqueado (normal en móviles). Se intentará de nuevo con interacción.
     }
-  };
+  }, [isMuted]);
 
-  const goInvite = () => {
+  const goInvite = useCallback(() => {
     if (isTransitioning) return;
 
     setIsTransitioning(true);
@@ -95,15 +96,18 @@ export default function InvitacionMiaFernanda() {
       requestAnimationFrame(() => setInviteVisible(true));
       window.setTimeout(() => setIsTransitioning(false), 500);
     }, 450);
-  };
+  }, [clearCaptionTimer, isTransitioning]);
+
+  const startExperience = useCallback(async () => {
+    setPhase("video");
+    setVideoError(false);
+    setNeedsUserPlay(false);
+    await startAudio();
+  }, [startAudio]);
 
   // Intentar autoplay del video (y audio) cuando estamos en fase video
   useEffect(() => {
     if (phase !== "video") return;
-
-    setInviteVisible(false);
-    setVideoError(false);
-    setNeedsUserPlay(false);
 
     const v = videoRef.current;
     if (!v) return;
@@ -128,8 +132,7 @@ export default function InvitacionMiaFernanda() {
     return () => {
       clearCaptionTimer();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase]);
+  }, [clearCaptionTimer, phase, scheduleCaption, startAudio]);
 
   useEffect(() => {
     const a = audioRef.current;
@@ -145,6 +148,25 @@ export default function InvitacionMiaFernanda() {
     }
   }, [isMuted]);
 
+  useEffect(() => {
+    if (isMuted || phase !== "video") return;
+
+    const unlockAudioOnInteraction = () => {
+      startAudio();
+    };
+
+    window.addEventListener("pointerdown", unlockAudioOnInteraction, {
+      passive: true,
+      once: true,
+    });
+    window.addEventListener("keydown", unlockAudioOnInteraction, { once: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", unlockAudioOnInteraction);
+      window.removeEventListener("keydown", unlockAudioOnInteraction);
+    };
+  }, [isMuted, phase, startAudio]);
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-sky-950 via-sky-900 to-slate-950 text-white overflow-hidden">
       {/* Audio global: continúa después del video */}
@@ -159,6 +181,45 @@ export default function InvitacionMiaFernanda() {
 
       {/* Snow layer */}
       <SnowLayer />
+
+      {/* =========================
+          PHASE 0: INTRO CARD
+         ========================= */}
+      {phase === "intro" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/15 bg-slate-950/80 p-5 shadow-2xl">
+            <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/15" />
+            <div className="pointer-events-none absolute -inset-1 rounded-3xl opacity-70 [mask-image:radial-gradient(220px_220px_at_50%_0%,black,transparent)]">
+              <div className="h-full w-full animate-shimmer bg-gradient-to-r from-white/0 via-white/15 to-white/0" />
+            </div>
+
+            <div className="relative">
+              <div className="overflow-hidden rounded-2xl border border-white/10 bg-slate-900/55 p-3">
+                <img
+                  src={INTRO_IMAGE_SRC}
+                  alt="Personajes de Frozen"
+                  className="mx-auto max-h-[380px] w-full object-contain"
+                />
+              </div>
+
+              <div className="mt-5 rounded-2xl border border-cyan-200/20 bg-slate-900/55 p-3">
+                <img
+                  src={PLAY_IMAGE_SRC}
+                  alt="Dale play"
+                  className="mx-auto h-auto w-full max-w-[280px] object-contain"
+                />
+              </div>
+
+              <button
+                onClick={startExperience}
+                className="mt-5 w-full rounded-2xl border border-cyan-200/25 bg-cyan-300/15 px-5 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-cyan-300/25 active:scale-[0.99]"
+              >
+                Iniciar aventura ❄️
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* =========================
           PHASE 1: VIDEO OVERLAY
@@ -317,6 +378,24 @@ export default function InvitacionMiaFernanda() {
               </a>
             </div>
 
+            <div className="mt-4">
+              <div className="relative mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border border-cyan-100/20 bg-slate-900/40">
+                <img
+                  src="/part3.png"
+                  alt="Marco no faltes"
+                  className="h-auto w-full object-contain"
+                  loading="lazy"
+                />
+
+                <img
+                  src="/no_faltes.png"
+                  alt="No faltes"
+                  className="absolute left-1/2 top-[40%] w-[62%] max-w-[220px] -translate-x-1/2 -translate-y-1/2 object-contain"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+
             {/* Footer */}
             <div className="mt-6 text-center">
               <p className="text-sm text-white/80">
@@ -403,20 +482,20 @@ function AuroraHeader() {
 
         {/* Stickers posicionados dentro del pizarrón */}
         <div className="absolute inset-0">
-          <div className="absolute left-1/2 top-[43%] -translate-x-1/2 -translate-y-1/2">
+          <div className="absolute inset-x-0 top-[43%] flex -translate-y-1/2 justify-center px-4">
             <img
               src="/mia_01.png"
               alt="Mía Fernanda"
-              className="sticker-pop-in w-[72%] min-w-[260px] max-w-[360px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
+              className="sticker-pop-in w-[68%] max-w-[340px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
               loading="eager"
             />
           </div>
 
-          <div className="absolute left-1/2 top-[67%] -translate-x-1/2 -translate-y-1/2">
+          <div className="absolute inset-x-0 top-[67%] flex -translate-y-1/2 justify-center px-4">
             <img
               src="/cumple_01.png"
               alt="Cumple 8 años"
-              className="sticker-pop-in-delay w-[78%] min-w-[280px] max-w-[390px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
+              className="sticker-pop-in-delay w-[74%] max-w-[360px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
               loading="eager"
             />
           </div>
