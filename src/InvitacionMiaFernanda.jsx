@@ -119,10 +119,10 @@ export default function InvitacionMiaFernanda() {
     startAudio();
     clearAutoInviteTimer();
 
-    // Inicia en 3:00 y dura hasta 3:35 => 35s
+    // Inicia en 3:00 y dura hasta 3:15 => 15s
     autoInviteTimeoutRef.current = window.setTimeout(() => {
       goInvite();
-    }, 35_000);
+    }, 15_000);
 
     return () => {
       clearCaptionTimer();
