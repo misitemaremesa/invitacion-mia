@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export default function InvitacionMiaFernanda() {
   // =========================
@@ -51,23 +51,22 @@ export default function InvitacionMiaFernanda() {
   const audioRef = useRef(null);
   const captionTimeoutRef = useRef(null);
 
-
-  const clearCaptionTimer = () => {
+  const clearCaptionTimer = useCallback(() => {
     if (captionTimeoutRef.current) {
       window.clearTimeout(captionTimeoutRef.current);
       captionTimeoutRef.current = null;
     }
-  };
+  }, []);
 
-  const scheduleCaption = () => {
+  const scheduleCaption = useCallback(() => {
     clearCaptionTimer();
     setShowVideoCaption(false);
     captionTimeoutRef.current = window.setTimeout(() => {
       setShowVideoCaption(true);
     }, 1000);
-  };
+  }, [clearCaptionTimer]);
 
-  const startAudio = async () => {
+  const startAudio = useCallback(async () => {
     const a = audioRef.current;
     if (!a || isMuted) return;
 
@@ -80,9 +79,9 @@ export default function InvitacionMiaFernanda() {
     } catch {
       // Autoplay puede ser bloqueado (normal en móviles). Se intentará de nuevo con interacción.
     }
-  };
+  }, [isMuted]);
 
-  const goInvite = () => {
+  const goInvite = useCallback(() => {
     if (isTransitioning) return;
 
     setIsTransitioning(true);
@@ -95,15 +94,11 @@ export default function InvitacionMiaFernanda() {
       requestAnimationFrame(() => setInviteVisible(true));
       window.setTimeout(() => setIsTransitioning(false), 500);
     }, 450);
-  };
+  }, [clearCaptionTimer, isTransitioning]);
 
   // Intentar autoplay del video (y audio) cuando estamos en fase video
   useEffect(() => {
     if (phase !== "video") return;
-
-    setInviteVisible(false);
-    setVideoError(false);
-    setNeedsUserPlay(false);
 
     const v = videoRef.current;
     if (!v) return;
@@ -128,8 +123,7 @@ export default function InvitacionMiaFernanda() {
     return () => {
       clearCaptionTimer();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase]);
+  }, [clearCaptionTimer, phase, scheduleCaption, startAudio]);
 
   useEffect(() => {
     const a = audioRef.current;
@@ -146,7 +140,7 @@ export default function InvitacionMiaFernanda() {
   }, [isMuted]);
 
   useEffect(() => {
-    if (isMuted) return;
+    if (isMuted || phase !== "video") return;
 
     const unlockAudioOnInteraction = () => {
       startAudio();
@@ -154,15 +148,15 @@ export default function InvitacionMiaFernanda() {
 
     window.addEventListener("pointerdown", unlockAudioOnInteraction, {
       passive: true,
+      once: true,
     });
-    window.addEventListener("keydown", unlockAudioOnInteraction);
+    window.addEventListener("keydown", unlockAudioOnInteraction, { once: true });
 
     return () => {
       window.removeEventListener("pointerdown", unlockAudioOnInteraction);
       window.removeEventListener("keydown", unlockAudioOnInteraction);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMuted]);
+  }, [isMuted, phase, startAudio]);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-sky-950 via-sky-900 to-slate-950 text-white overflow-hidden">
