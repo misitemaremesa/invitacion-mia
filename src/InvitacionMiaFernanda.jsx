@@ -392,8 +392,8 @@ export default function InvitacionMiaFernanda() {
                   />
                 </div>
 
-                <div className="absolute inset-x-0 top-[80.5%] flex -translate-y-1/2 justify-center px-6">
-                  <div className="w-[34%] max-w-[124px] overflow-hidden rounded-[38%]">
+                <div className="absolute inset-x-0 top-[83%] flex -translate-y-1/2 justify-center px-6">
+                  <div className="w-[30%] max-w-[110px] overflow-hidden rounded-[38%]">
                     <img
                       src="/mia_01.png"
                       alt="Mía Fernanda en placa"
