@@ -346,6 +346,15 @@ export default function InvitacionMiaFernanda() {
                     loading="lazy"
                   />
                 </div>
+
+                <div className="absolute left-1/2 top-[79%] w-[36%] max-w-[140px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[40%] px-1">
+                  <img
+                    src="/mia_01.png"
+                    alt="Mía Fernanda en placa"
+                    className="h-auto w-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
               </div>
             </div>
 
