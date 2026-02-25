@@ -468,7 +468,7 @@ function AuroraHeader() {
             <img
               src="/mia_01.png"
               alt="Mía Fernanda"
-              className="sticker-pop-in w-[72%] min-w-[260px] max-w-[360px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
+              className="sticker-pop-in w-[56%] max-w-[280px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
               loading="eager"
             />
           </div>
@@ -477,7 +477,7 @@ function AuroraHeader() {
             <img
               src="/cumple_01.png"
               alt="Cumple 8 años"
-              className="sticker-pop-in-delay w-[78%] min-w-[280px] max-w-[390px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
+              className="sticker-pop-in-delay w-[62%] max-w-[300px] object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.55)]"
               loading="eager"
             />
           </div>
