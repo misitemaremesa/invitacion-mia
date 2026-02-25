@@ -387,12 +387,14 @@ export default function InvitacionMiaFernanda() {
                   loading="lazy"
                 />
 
-                <img
-                  src="/no_faltes.png"
-                  alt="No faltes"
-                  className="absolute left-1/2 top-[40%] w-[62%] max-w-[220px] -translate-x-1/2 -translate-y-1/2 object-contain"
-                  loading="lazy"
-                />
+                <div className="absolute left-1/2 top-[42%] aspect-square w-[56%] max-w-[210px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full px-3 py-4">
+                  <img
+                    src="/no_faltes.png"
+                    alt="No faltes"
+                    className="h-full w-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
               </div>
             </div>
 
