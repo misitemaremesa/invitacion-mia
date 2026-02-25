@@ -10,7 +10,7 @@ export default function InvitacionMiaFernanda() {
       edad: "8 Años",
       fecha: "11 de marzo 2026",
       hora: "10:00 a.m.",
-      lugar: "Colegio Jaques Roussea",
+      lugar: "Colegio Jaques Rousseau",
     }),
     []
   );
