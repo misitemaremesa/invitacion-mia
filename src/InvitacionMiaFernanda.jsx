@@ -378,6 +378,15 @@ export default function InvitacionMiaFernanda() {
               </a>
             </div>
 
+            <div className="mt-4 rounded-2xl border border-cyan-100/20 bg-white/5 p-3">
+              <img
+                src="/no_faltes.png"
+                alt="No faltes"
+                className="mx-auto h-auto w-full max-w-[320px] object-contain"
+                loading="lazy"
+              />
+            </div>
+
             {/* Footer */}
             <div className="mt-6 text-center">
               <p className="text-sm text-white/80">
