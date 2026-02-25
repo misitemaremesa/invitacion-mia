@@ -8,7 +8,7 @@ export default function InvitacionMiaFernanda() {
     () => ({
       festejada: "Mía Fernanda",
       edad: "8 Años",
-      fecha: "12 de marzo 2026",
+      fecha: "11 de marzo 2026",
       hora: "10:00 a.m.",
       lugar: "Colegio Jaques Roussea",
     }),
@@ -23,8 +23,8 @@ export default function InvitacionMiaFernanda() {
     const location = encodeURIComponent(DATA.lugar);
 
     // Hora local de México (CDMX): UTC-6 para marzo 2026
-    const start = "20260312T160000Z";
-    const end = "20260312T190000Z";
+    const start = "20260311T160000Z";
+    const end = "20260311T190000Z";
 
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
   }, [DATA.lugar]);
@@ -50,11 +50,20 @@ export default function InvitacionMiaFernanda() {
 
   const audioRef = useRef(null);
   const captionTimeoutRef = useRef(null);
+  const autoInviteTimeoutRef = useRef(null);
 
   const clearCaptionTimer = useCallback(() => {
     if (captionTimeoutRef.current) {
       window.clearTimeout(captionTimeoutRef.current);
       captionTimeoutRef.current = null;
+    }
+  }, []);
+
+
+  const clearAutoInviteTimer = useCallback(() => {
+    if (autoInviteTimeoutRef.current) {
+      window.clearTimeout(autoInviteTimeoutRef.current);
+      autoInviteTimeoutRef.current = null;
     }
   }, []);
 
@@ -86,6 +95,7 @@ export default function InvitacionMiaFernanda() {
 
     setIsTransitioning(true);
     clearCaptionTimer();
+    clearAutoInviteTimer();
     setShowVideoCaption(false);
 
     // Fade-out overlay primero, luego mostramos invitación con fade-in
@@ -94,7 +104,7 @@ export default function InvitacionMiaFernanda() {
       requestAnimationFrame(() => setInviteVisible(true));
       window.setTimeout(() => setIsTransitioning(false), 500);
     }, 450);
-  }, [clearCaptionTimer, isTransitioning]);
+  }, [clearAutoInviteTimer, clearCaptionTimer, isTransitioning]);
 
   const startExperience = useCallback(async () => {
     setPhase("video");
@@ -102,16 +112,23 @@ export default function InvitacionMiaFernanda() {
     await startAudio();
   }, [scheduleCaption, startAudio]);
 
-  // Preparar audio cuando entramos a fase video
+  // Preparar audio y avance automático cuando entramos a fase video
   useEffect(() => {
     if (phase !== "video") return;
 
     startAudio();
+    clearAutoInviteTimer();
+
+    // Inicia en 3:00 y dura hasta 3:35 => 35s
+    autoInviteTimeoutRef.current = window.setTimeout(() => {
+      goInvite();
+    }, 35_000);
 
     return () => {
       clearCaptionTimer();
+      clearAutoInviteTimer();
     };
-  }, [clearCaptionTimer, phase, startAudio]);
+  }, [clearAutoInviteTimer, clearCaptionTimer, goInvite, phase, startAudio]);
 
   useEffect(() => {
     const a = audioRef.current;
